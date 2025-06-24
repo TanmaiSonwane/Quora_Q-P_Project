@@ -236,6 +236,8 @@ def preprocess(q):
     return q
 
 
+from scipy.sparse import hstack, csr_matrix
+
 def query_point_creator(q1, q2):
     input_query = []
 
@@ -246,18 +248,16 @@ def query_point_creator(q1, q2):
     # fetch basic features
     input_query.append(len(q1))
     input_query.append(len(q2))
-
     input_query.append(len(q1.split(" ")))
     input_query.append(len(q2.split(" ")))
 
     input_query.append(test_common_words(q1, q2))
     input_query.append(test_total_words(q1, q2))
-    input_query.append(round(test_common_words(q1, q2) / test_total_words(q1, q2), 2))
+    input_query.append(round(test_common_words(q1, q2) / test_total_words(q1, q2), 2) if test_total_words(q1, q2) else 0)
 
     # fetch token features
     token_features = test_fetch_token_features(q1, q2)
     input_query.extend(token_features)
-
 
     # fetch fuzzy features
     fuzzy_features = [
@@ -267,10 +267,15 @@ def query_point_creator(q1, q2):
     ]
     input_query.extend(fuzzy_features)
 
-    # bow feature for q1
-    q1_bow = cv.transform([q1]).toarray()
+    # BOW features
+    q1_bow = cv.transform([q1])
+    q2_bow = cv.transform([q2])
 
-    # bow feature for q2
-    q2_bow = cv.transform([q2]).toarray()
+    # Combine all as sparse matrix
+    final_input = hstack([
+        csr_matrix(np.array(input_query).reshape(1, -1)),  # shape: (1, 18)
+        q1_bow,                                            # shape: (1, 3000)
+        q2_bow                                             # shape: (1, 3000)
+    ])
 
-    return np.hstack((np.array(input_query).reshape(1, 18), q1_bow, q2_bow))
+    return final_input
