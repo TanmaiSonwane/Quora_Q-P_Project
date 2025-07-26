@@ -6,6 +6,9 @@ A machine learning and NLP-based app that detects whether two questions are sema
 
 **Live Demo:** [Click here to try it out](https://quora-qp-project00.streamlit.app/)
 
+![Screenshot](Notduplicate.png)
+
+![Screenshot](Duplicate.png)
 
 ---
 
