@@ -1,4 +1,3 @@
-# Quora_Q/P_Project
 
 #  Duplicate Question Detector | Quora-Inspired NLP Project
 
